@@ -5,7 +5,9 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { Textarea } from "@/components/ui/textarea";
 import { useSelectedRules } from "@/hooks/use-selected-rules";
 import { rulesets } from "@/rulesets";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function Home() {
   const { selectedRuleIds } = useSelectedRules();
@@ -39,15 +41,22 @@ export default function Home() {
     ].join("\n");
   }, [selectedRuleIds]);
 
+  const copyToClipboard = useCallback(async () => {
+    await navigator.clipboard.writeText(textAreaText);
+    toast.success("Copied to clipboard");
+  }, [textAreaText]);
+
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="flex flex-col p-4 gap-4">
+      <SidebarInset className="flex flex-col p-4 gap-4 relative">
         <main className="flex flex-col gap-8 row-start-2 items-center py-2">
           <p className="text-2xl font-bold">Rule your cursor</p>
         </main>
-        <Textarea className="h-full" readOnly value={textAreaText} />
-        <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center"></footer>
+        <Textarea className="h-full font-mono" readOnly value={textAreaText} />
+        <Button className="absolute bottom-8 right-8" onClick={copyToClipboard}>
+          Copy to clipboard
+        </Button>
       </SidebarInset>
     </SidebarProvider>
   );
